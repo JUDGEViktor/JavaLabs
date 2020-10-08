@@ -1,54 +1,84 @@
 import java.io.*;
+import java.util.logging.Level;
 
 public class Config {
 
-    private static final String INPUT_FILE_KEY_WORD = "input file";
-    private static final String OUTPUT_FILE_KEY_WORD = "output file";
-    private static final String INFO_FILE_KEY_WORD = "info file";
-    private static final String MODE_KEY_WORD = "mode";
-    private static final String SEPARATOR = "=";
+    final static int numParameters = 3;
 
-    public static String INPUT_FILE_NAME;
-    public static String OUTPUT_FILE_NAME;
-    public static String INFO_FILE_NAME;
-    public static String MODE_NAME;
+    enum Grammar{
+        DELIMITER(":");
 
-    private void ReadConfig(String fileConfigName) {
-        try {
-            File file = new File(fileConfigName);
-            FileReader fr = new FileReader(file);
-            BufferedReader reader = new BufferedReader(fr);
-            for(String line = reader.readLine(); line != null; line = reader.readLine()){
-                if(line.contains(INPUT_FILE_KEY_WORD)) {
-                    INPUT_FILE_NAME = line.replace(INPUT_FILE_KEY_WORD, "").replace(SEPARATOR,"").trim();
+        Grammar(String str) {name = str;}
+
+        public final String name;
+    }
+
+    enum Modes{
+        COMPRESS("compress"),
+        DECOMPRESS("decompress");
+
+        Modes(String str) {name = str;}
+
+        public final String name;
+    }
+
+    enum Vocabulary{
+        INPUT_FILE("input file", 0),
+        OUTPUT_FILE("output file", 1),
+        MODE("mode", 2);
+
+        Vocabulary(String str, int i_) {name = str; i = i_;}
+
+        public final String name;
+        public final int i;
+    }
+
+
+    public Config(String fileName){
+        configFileName = fileName;
+    }
+
+    public String[] readConfig()
+    {
+        try
+        {
+            String[] params = new String[numParameters];
+
+            BufferedReader buff = new BufferedReader(new FileReader(configFileName));
+
+            for (String line = buff.readLine(); line != null; line = buff.readLine())
+            {
+                String[] tokens = line.split(Grammar.DELIMITER.name);
+
+                if (tokens.length != 2) {
+                    Log.logger.log(Level.SEVERE, Log.ERRORS.ERROR_CONFIG.name());
+                    return null;
                 }
-                if(line.contains(OUTPUT_FILE_KEY_WORD)) {
-                    OUTPUT_FILE_NAME = line.replace(OUTPUT_FILE_KEY_WORD, "").replace(SEPARATOR,"").trim();
-                }
-                if(line.contains(INFO_FILE_KEY_WORD)) {
-                    INFO_FILE_NAME = line.replace(INFO_FILE_KEY_WORD, "").replace(SEPARATOR,"").trim();
-                }
-                if(line.contains(MODE_KEY_WORD)) {
-                    MODE_NAME = line.replace(MODE_KEY_WORD, "").replace(SEPARATOR,"").trim();
+
+                for (int i = 0; i < tokens.length; i++)
+                {
+                    String tokenType = tokens[i].trim();
+
+                    if (tokenType.equalsIgnoreCase(Vocabulary.INPUT_FILE.name))
+                        params[Vocabulary.INPUT_FILE.i] = tokens[++i].trim();
+
+                    else if (tokenType.equalsIgnoreCase(Vocabulary.OUTPUT_FILE.name))
+                        params[Vocabulary.OUTPUT_FILE.i] = tokens[++i].trim();
+
+                    else if (tokenType.equalsIgnoreCase(Vocabulary.MODE.name))
+                        params[Vocabulary.MODE.i] = tokens[++i].trim().toLowerCase();
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return params;
+        }
+        catch (FileNotFoundException e) {
+            Log.logger.log(Level.SEVERE, Log.ERRORS.ERROR_WITH_CONFIG_FILE.name());
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.logger.log(Level.SEVERE, Log.ERRORS.ERROR_WITH_CONFIG_FILE.name());
         }
+        return null;
     }
 
-    public Config(String fileConfigName){
-        ReadConfig(fileConfigName);
-        try {
-            if (MODE_NAME.equals("compress")) {
-                new Compress(INPUT_FILE_NAME, OUTPUT_FILE_NAME, INFO_FILE_NAME);
-            } else if (MODE_NAME.equals("decompress")) {
-                new Decompress(INPUT_FILE_NAME, OUTPUT_FILE_NAME);
-            }
-        } catch (IOException e){
-            System.out.println(e.getMessage());
-        }
-    }
+    String configFileName;
+
 }

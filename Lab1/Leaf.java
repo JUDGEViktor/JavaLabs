@@ -1,5 +1,5 @@
 
-public final class Leaf extends Node {
+public class Leaf extends Node {
 	
 	public final int symbol;
 

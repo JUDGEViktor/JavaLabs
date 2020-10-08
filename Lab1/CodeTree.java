@@ -1,22 +1,20 @@
-
 import java.util.*;
 
-public final class CodeTree {
+public class CodeTree {
 
-	public final InternalNode root;
+	public InternalNode root;
 
 	private List<List<Integer>> codes;
-	
 
-	public CodeTree(InternalNode root, int symbolLimit) {
-		this.root = root;
-		
+	CodeTree() {};
+
+	public void InitCodes(int symbolLimit){
 		codes = new ArrayList<List<Integer>>();  // Initially all null
 		for (int i = 0; i < symbolLimit; i++)
 			codes.add(null);
-		buildCodeList(root, new ArrayList<Integer>());  // Fill 'codes' with appropriate data
+		buildCodeList(root, new ArrayList<Integer>());
+		return;
 	}
-	
 
 	private void buildCodeList(Node node, List<Integer> prefix) {
 		if (node instanceof InternalNode) {
@@ -32,13 +30,9 @@ public final class CodeTree {
 			
 		} else if (node instanceof Leaf) {
 			Leaf leaf = (Leaf)node;
-//			if (leaf.symbol >= codes.size())
-//				throw new IllegalArgumentException("Symbol exceeds symbol limit");
-//			if (codes.get(leaf.symbol) != null)
-//				throw new IllegalArgumentException("Symbol has more than one code");
 			codes.set(leaf.symbol, new ArrayList<Integer>(prefix));
-
 		}
+		return;
 	}
 
 	public List<Integer> getCode(int symbol) {
