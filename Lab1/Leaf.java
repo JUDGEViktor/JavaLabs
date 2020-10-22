@@ -1,10 +1,10 @@
 
-public class Leaf extends Node {
-	
-	public final int symbol;
+public final class Leaf extends Node {
 
-	public Leaf(int sym) {
+	public Leaf(byte sym) {
 		symbol = sym;
 	}
+
+	public final byte symbol;
 	
 }

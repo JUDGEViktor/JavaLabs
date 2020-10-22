@@ -1,26 +1,20 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 public class Encoder {
-
-    private int currentByte;
-
-    private final int EOF_SYMBOL = 256;
-
-    // Number of bits already stored in byte
-    private int numBitsFilled;
 
     public Encoder() {
         currentByte = 0;
         numBitsFilled = 0;
     }
 
-    private int Encode(int b){
-        if (b != 0 && b != 1){
+    private int Encode(int bit){
+        if (bit != 0 && bit != 1){
             Log.logger.log(Level.SEVERE, Log.ERRORS.ERROR_WHILE_ENCODING.name());
             return -1;
         }
-        currentByte = (currentByte << 1) | b;
+        currentByte = (currentByte << 1) | bit;
         numBitsFilled++;
         if (numBitsFilled == 8) {
             int res = currentByte;
@@ -31,34 +25,38 @@ public class Encoder {
         return -1;
     }
 
-    public int Encode(CodeTree codeTree, int byteToEncode, ByteWriter byteWriter){
-        List<Integer> bits;
-        int byteEncoded;
-        bits = codeTree.getCode(byteToEncode);
-        for(int bit : bits) {
-            byteEncoded = Encode(bit);
-            if (byteEncoded != -1)
-                byteWriter.Write(byteEncoded);
-        }
-        return -1;
+    public byte[] EncodeInt(int length) {
+        return new byte[]{
+            (byte) (length >>> 24),
+            (byte) (length >>> 16),
+            (byte) (length >>> 8),
+            (byte) (length >>> 0)};
     }
 
 
-    public void EncodeEnd(CodeTree codeTree, ByteWriter byteWriter){
-        List<Integer> bits;
+    public ArrayList<Byte> Encode(CodeTree codeTree, byte[] bytesToCompress){
+        ArrayList<Byte> compressedBytes = new ArrayList<Byte>();
+        ArrayList<Integer> bits;
         int byteEncoded;
-        bits = codeTree.getCode(EOF_SYMBOL);
-        for(int bit : bits) {
-            byteEncoded = Encode(bit);
-            if (byteEncoded != -1)
-                byteWriter.Write(byteEncoded);
+        for(byte byteToEncode : bytesToCompress){
+            bits = codeTree.getCode(byteToEncode);
+            for(int bit : bits) {
+                byteEncoded = Encode(bit);
+                if (byteEncoded != -1)
+                    compressedBytes.add((byte)byteEncoded);
+            }
         }
         while (numBitsFilled != 0) {
             byteEncoded = Encode(0);
             if (byteEncoded != - 1)
-                byteWriter.Write(byteEncoded);
+                compressedBytes.add((byte)byteEncoded);
         }
-        return;
+        return compressedBytes;
     }
+
+
+    private int currentByte;
+
+    private int numBitsFilled;
 
 }

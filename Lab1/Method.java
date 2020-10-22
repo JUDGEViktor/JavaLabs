@@ -1,5 +1,5 @@
 interface Method {
 
-    public void Run(ByteReader byteReader, ByteWriter byteWriter);
+    public byte[] Run(byte[] bytesToCompress);
 
 }

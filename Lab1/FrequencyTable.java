@@ -3,34 +3,40 @@ import java.util.*;
 
 public class FrequencyTable {
 
-	private final int FREQUENCIES_ARRAY_LENGTH_SIZE = 257;
-
-	private final int EOF_SYMBOL = 256;
-
-	private int[] frequencies;
-
 	FrequencyTable(){
-		frequencies = new int[FREQUENCIES_ARRAY_LENGTH_SIZE];
+		frequencies = new HashMap<>();
 	}
 
-	public void CountFrequencies(ByteReader byteReader)  {
-		int byte_ = byteReader.Read();
-		while (byte_ != -1) {
+	FrequencyTable(HashMap<Byte, Integer> frequencies_){
+		frequencies = frequencies_;
+	}
+
+	public void CountFrequencies(byte[] bytesToCountFrequenciesOf)  {
+		for(byte byte_ : bytesToCountFrequenciesOf){
 			Increment(byte_);
-			byte_ = byteReader.Read();
 		}
-		Increment(EOF_SYMBOL);
-		byteReader.Reset();
 	}
 
-	public int GetSymbolLimit() {
-		return frequencies.length;
+	public void Increment(byte symbol) {
+		int freq;
+		if(!frequencies.containsKey(symbol)) {
+			frequencies.put(symbol, 0);
+		} else{
+			freq = frequencies.get(symbol);
+			frequencies.put(symbol, ++freq);
+		}
 	}
 
-	public int[] GetFrequencies() { return frequencies; }
-
-	public void Increment(int symbol) {
-		frequencies[symbol]++;
+	public int GetMethaInfoLength(){
+		return frequencies.size() * 5;
 	}
+
+	public int GetNumOfFrequencies(){
+		return frequencies.size();
+	}
+
+	public HashMap<Byte, Integer> GetFrequencies() { return frequencies; }
+
+	private HashMap<Byte, Integer> frequencies;
 	
 }

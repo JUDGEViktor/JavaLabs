@@ -1,19 +1,24 @@
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class FrequencyTree extends CodeTree{
 
-    FrequencyTree(int[] arrOnWhichTreeWillBeBuild){
+    FrequencyTree(HashMap<Byte, Integer> frequencies){
         Queue<NodeWithFrequency> priorityQueue = new PriorityQueue<NodeWithFrequency>();
-
-        for (int i = 0; i < arrOnWhichTreeWillBeBuild.length; i++) {
-            if (arrOnWhichTreeWillBeBuild[i] > 0)
-                priorityQueue.add(new NodeWithFrequency(new Leaf(i), i, arrOnWhichTreeWillBeBuild[i]));
+        Iterator it = frequencies.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            int freq = (int)pair.getValue();
+            byte byte_ = (byte)pair.getKey();
+            priorityQueue.add(new NodeWithFrequency(new Leaf(byte_), byte_, freq));
         }
-
-        for (int i = 0; i < arrOnWhichTreeWillBeBuild.length && priorityQueue.size() < 2; i++) {
-            if (arrOnWhichTreeWillBeBuild[i] == 0)
-                priorityQueue.add(new NodeWithFrequency(new Leaf(i), i, 0));
+        //at least tree should has 2 nodes
+        while (priorityQueue.size() < 2) {
+            for(byte b = -128; b < 127; b++) {
+                if (!frequencies.containsKey(b))
+                    priorityQueue.add(new NodeWithFrequency(new Leaf(b), b, 0));
+                if(priorityQueue.size() == 2)
+                    break;
+            }
         }
 
         // Tie together two nodes with the lowest frequency
@@ -22,21 +27,27 @@ public class FrequencyTree extends CodeTree{
             NodeWithFrequency y = priorityQueue.remove();
             priorityQueue.add(new NodeWithFrequency(
                     new InternalNode(x.node, y.node),
-                    Math.min(x.lowestSymbol, y.lowestSymbol),
+                    Min(x.lowestSymbol, y.lowestSymbol),
                     x.frequency + y.frequency));
         }
 
-        root = (InternalNode)priorityQueue.remove().node;
-        InitCodes(arrOnWhichTreeWillBeBuild.length);
+        root = (InternalNode)priorityQueue.peek().node;
+        InitCodes();
     }
 
-    private class NodeWithFrequency implements Comparable<NodeWithFrequency> {
+
+    private byte Min(byte x1, byte x2){
+        return x1 < x2 ? x1 : x2;
+    }
+
+
+    private static class NodeWithFrequency implements Comparable<NodeWithFrequency> {
 
         public final Node node;
-        public final int lowestSymbol;
-        public final long frequency;
+        public final byte lowestSymbol;
+        public final int frequency;
 
-        public NodeWithFrequency(Node nd, int lowSym, long freq) {
+        public NodeWithFrequency(Node nd, byte lowSym, int freq) {
             node = nd;
             lowestSymbol = lowSym;
             frequency = freq;
@@ -57,3 +68,4 @@ public class FrequencyTree extends CodeTree{
     }
 
 }
+

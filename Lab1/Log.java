@@ -3,6 +3,7 @@ import java.util.logging.Logger;
 public class Log {
 
     enum ERRORS{
+        ERROR_COMMAND_LINES_PARAMETERS("command line parameters"),
         ERROR_CONFIG("bad config format"),
         ERROR_WITH_CONFIG_FILE("error with config file"),
         ERROR_WITH_INPUT_OUTPUT_FILE("error with input/output file"),

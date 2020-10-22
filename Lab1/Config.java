@@ -3,15 +3,9 @@ import java.util.logging.Level;
 
 public class Config {
 
-    final static int numParameters = 3;
+    final static int numParameters = 4;
 
-    enum Grammar{
-        DELIMITER(":");
-
-        Grammar(String str) {name = str;}
-
-        public final String name;
-    }
+    final static String delimiter = ":";
 
     enum Modes{
         COMPRESS("compress"),
@@ -25,7 +19,8 @@ public class Config {
     enum Vocabulary{
         INPUT_FILE("input file", 0),
         OUTPUT_FILE("output file", 1),
-        MODE("mode", 2);
+        SIZE("size", 2),
+        MODE("mode", 3);
 
         Vocabulary(String str, int i_) {name = str; i = i_;}
 
@@ -48,7 +43,7 @@ public class Config {
 
             for (String line = buff.readLine(); line != null; line = buff.readLine())
             {
-                String[] tokens = line.split(Grammar.DELIMITER.name);
+                String[] tokens = line.split(delimiter);
 
                 if (tokens.length != 2) {
                     Log.logger.log(Level.SEVERE, Log.ERRORS.ERROR_CONFIG.name());
@@ -67,6 +62,9 @@ public class Config {
 
                     else if (tokenType.equalsIgnoreCase(Vocabulary.MODE.name))
                         params[Vocabulary.MODE.i] = tokens[++i].trim().toLowerCase();
+
+                    else if (tokenType.equalsIgnoreCase(Vocabulary.SIZE.name))
+                        params[Vocabulary.SIZE.i] = tokens[++i].trim().toLowerCase();
                 }
             }
             return params;
