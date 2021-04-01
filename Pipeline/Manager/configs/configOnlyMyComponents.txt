@@ -1,0 +1,12 @@
+input file = test_files\war.txt
+output file = test_files\warBack.txt
+
+reader = com.Viktor.main.Reader ; configs\My\readerConfig.txt
+
+executor = com.Viktor.main.Archiver ; configs\My\compress.txt
+
+executor = com.Viktor.main.Archiver ; configs\My\decompress.txt
+
+writer = com.Viktor.main.Writer ; configs\My\writerConfig.txt
+
+
